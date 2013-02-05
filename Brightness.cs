@@ -7,11 +7,10 @@ namespace RomanKeys
 {
     static class Brightness
     {
-        private static BarPopup _popup;
-
         public static void Initialize()
         {
-            _popup = new BarPopup { Caption = "Brightness" };
+            if (Program.Settings.BrightnessIndicator == null)
+                Program.Settings.BrightnessIndicator = new BarPopup { Caption = "Brightness", Timeout = TimeSpan.FromSeconds(1.2) };
         }
 
         public static void Step(bool up)
@@ -32,12 +31,9 @@ namespace RomanKeys
 
                 moSet.InvokeMethod("WmiSetBrightness", new object[] { 1, levels[index] });
 
-                _popup.Invoke((Action) delegate
-                {
-                    _popup.MaxValue = levels.Count - 1;
-                    _popup.Value = index;
-                    _popup.DisplayPopup();
-                });
+                Program.Settings.BrightnessIndicator.MaxValue = levels.Count - 1;
+                Program.Settings.BrightnessIndicator.Value = index;
+                Program.Settings.BrightnessIndicator.Display();
             }
         }
 

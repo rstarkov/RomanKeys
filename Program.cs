@@ -7,6 +7,8 @@ namespace RomanKeys
 {
     static class Program
     {
+        public static Settings Settings;
+
         private static GlobalKeyboardListener _keyboard;
 
         [STAThread]
@@ -15,11 +17,15 @@ namespace RomanKeys
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            SettingsUtil.LoadSettings(out Settings);
+
+            Brightness.Initialize();
+
+            Settings.Save();
+
             _keyboard = new GlobalKeyboardListener();
             _keyboard.HookAllKeys = true;
             _keyboard.KeyDown += keyboard_KeyDown;
-
-            Brightness.Initialize();
 
             Application.Run();
         }

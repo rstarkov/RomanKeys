@@ -17,8 +17,11 @@ namespace RomanKeys
     {
         public ClickAction ClickHandling { get; set; }
 
-        public AlphaBlendedForm()
+        private bool _showWithoutActivation;
+
+        public AlphaBlendedForm(bool showWithoutActivation = false)
         {
+            _showWithoutActivation = showWithoutActivation;
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.Manual;
             ShowInTaskbar = false;
@@ -44,6 +47,7 @@ namespace RomanKeys
                 Close();
         }
 
+        protected override bool ShowWithoutActivation { get { return _showWithoutActivation; } }
         protected override CreateParams CreateParams
         {
             get
