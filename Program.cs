@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RT.Util;
+using RT.Util.Xml;
 
 namespace RomanKeys
 {
@@ -17,6 +18,8 @@ namespace RomanKeys
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            XmlClassify.DefaultOptions.AddTypeOptions(typeof(Hotkey), new HotkeyTypeOptions());
+            XmlClassify.DefaultOptions.AddTypeOptions(typeof(TimeSpan), new TimeSpanTypeOptions());
             SettingsUtil.LoadSettings(out Settings);
 
             if (Settings.Modules.Count == 0)
@@ -36,7 +39,7 @@ namespace RomanKeys
         private static void keyboard_KeyDown(object sender, GlobalKeyEventArgs e)
         {
             foreach (var module in Program.Settings.Modules)
-                if (module.HandleKey((Key) e.VirtualKeyCode, e.ModifierKeys))
+                if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys)))
                 {
                     e.Handled = true;
                     return;

@@ -9,13 +9,17 @@ namespace RomanKeys
 {
     class BrightnessModule : IModule
     {
-        private IValueIndicator _indicator = new BarPopup { Caption = "Brightness", Timeout = TimeSpan.FromSeconds(1.2) };
+        public IValueIndicator Indicator = new BarPopup { Caption = "Brightness", Timeout = TimeSpan.FromSeconds(1.2) };
+        public Hotkey HotkeyBrighter = new Hotkey(Key.Up, alt: true, win: true);
+        public Hotkey HotkeyDarker = new Hotkey(Key.Down, alt: true, win: true);
 
-        public bool HandleKey(Key key, ModifierKeysState modifiers)
+        public bool HandleKey(Hotkey key)
         {
-            if ((key == Key.Up || key == Key.Down) && modifiers.Alt && modifiers.Win)
+            bool up = key == HotkeyBrighter;
+            bool dn = key == HotkeyDarker;
+            if (up || dn)
             {
-                Task.Run(() => { step(key == Key.Up); });
+                Task.Run(() => { step(up); });
                 return true;
             }
             return false;
@@ -39,9 +43,9 @@ namespace RomanKeys
 
                 moSet.InvokeMethod("WmiSetBrightness", new object[] { 1, levels[index] });
 
-                _indicator.MaxValue = levels.Count - 1;
-                _indicator.Value = index;
-                _indicator.Display();
+                Indicator.MaxValue = levels.Count - 1;
+                Indicator.Value = index;
+                Indicator.Display();
             }
         }
 

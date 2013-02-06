@@ -1,16 +1,81 @@
 ﻿using System;
 using System.Linq;
+using RT.Util;
+using RT.Util.ExtensionMethods;
+using RT.Util.Xml;
 
 namespace RomanKeys
 {
+    sealed class Hotkey
+    {
+        public Key Key { get; private set; }
+        public ModifierKeysState Modifiers { get; private set; }
+
+        public Hotkey(Key key, ModifierKeysState modifiers)
+        {
+            Key = key;
+            Modifiers = modifiers;
+        }
+
+        public Hotkey(Key key, bool ctrl = false, bool alt = false, bool shift = false, bool win = false)
+            : this(key, new ModifierKeysState(ctrl, alt, shift, win))
+        {
+        }
+
+        public static bool operator ==(Hotkey key1, Hotkey key2)
+        {
+            return key1.Key == key2.Key && key1.Modifiers == key2.Modifiers;
+        }
+
+        public static bool operator !=(Hotkey key1, Hotkey key2)
+        {
+            return key1.Key != key2.Key || key1.Modifiers != key2.Modifiers;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is Hotkey) && (this == (Hotkey) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Key.GetHashCode() * 7919 + Modifiers.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return (Modifiers.Ctrl ? "Ctrl+" : "") + (Modifiers.Alt ? "Alt+" : "") + (Modifiers.Shift ? "Shift+" : "") + (Modifiers.Win ? "Win+" : "") + Key.ToString();
+        }
+
+        public static Hotkey Parse(string str)
+        {
+            var parts = str.Split('+');
+            bool ctrl = false, alt = false, shift = false, win = false;
+            for (int i = 0; i < parts.Length - 1; i++)
+            {
+                if (parts[i].EqualsNoCase("Ctrl"))
+                    ctrl = true;
+                else if (parts[i].EqualsNoCase("Alt"))
+                    alt = true;
+                else if (parts[i].EqualsNoCase("Shift"))
+                    shift = true;
+                else if (parts[i].EqualsNoCase("Win"))
+                    win = true;
+                else
+                    throw new ArgumentException("Cannot parse Hotkey part: “" + parts[i] + "”");
+            }
+            return new Hotkey(EnumStrong.Parse<Key>(parts[parts.Length - 1], true), new ModifierKeysState(ctrl, alt, shift, win));
+        }
+    }
+
     enum Key
     {
-        MouseLeft = 1,
-        MouseRight = 2,
+        //MouseLeft = 1,
+        //MouseRight = 2,
         Break = 3,
-        MouseMiddle = 4,
-        MouseBack = 5,
-        MouseForward = 6,
+        //MouseMiddle = 4,
+        //MouseBack = 5,
+        //MouseForward = 6,
         Backspace = 8,
         Tab = 9,
         LineFeed = 10,
@@ -177,10 +242,10 @@ namespace RomanKeys
         Pa1 = 253,
         OemClear = 254,
         // Not in the standard Keys enum
-        MouseWheelUp = 256,
-        MouseWheelDown = 257,
-        MouseWheelLeft = 258,
-        MouseWheelRight = 259,
+        //MouseWheelUp = 256,
+        //MouseWheelDown = 257,
+        //MouseWheelLeft = 258,
+        //MouseWheelRight = 259,
         NumEnter = 260,
     }
 }
