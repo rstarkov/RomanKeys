@@ -1,19 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Management;
+using System.Threading.Tasks;
+using RT.Util;
 using RT.Util.ExtensionMethods;
 
 namespace RomanKeys
 {
-    static class Brightness
+    class BrightnessModule : IModule
     {
-        public static void Initialize()
+        private IValueIndicator _indicator = new BarPopup { Caption = "Brightness", Timeout = TimeSpan.FromSeconds(1.2) };
+
+        public bool HandleKey(Key key, ModifierKeysState modifiers)
         {
-            if (Program.Settings.BrightnessIndicator == null)
-                Program.Settings.BrightnessIndicator = new BarPopup { Caption = "Brightness", Timeout = TimeSpan.FromSeconds(1.2) };
+            if ((key == Key.Up || key == Key.Down) && modifiers.Alt && modifiers.Win)
+            {
+                Task.Run(() => { step(key == Key.Up); });
+                return true;
+            }
+            return false;
         }
 
-        public static void Step(bool up)
+        private void step(bool up)
         {
             var scope = new ManagementScope(@"\\.\root\wmi");
             using (var mcGet = new ManagementClass("WmiMonitorBrightness") { Scope = scope })
@@ -31,9 +39,9 @@ namespace RomanKeys
 
                 moSet.InvokeMethod("WmiSetBrightness", new object[] { 1, levels[index] });
 
-                Program.Settings.BrightnessIndicator.MaxValue = levels.Count - 1;
-                Program.Settings.BrightnessIndicator.Value = index;
-                Program.Settings.BrightnessIndicator.Display();
+                _indicator.MaxValue = levels.Count - 1;
+                _indicator.Value = index;
+                _indicator.Display();
             }
         }
 

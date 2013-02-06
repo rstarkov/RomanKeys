@@ -19,7 +19,10 @@ namespace RomanKeys
 
             SettingsUtil.LoadSettings(out Settings);
 
-            Brightness.Initialize();
+            if (Settings.Modules.Count == 0)
+            {
+                Settings.Modules.Add(new BrightnessModule());
+            }
 
             Settings.Save();
 
@@ -32,23 +35,12 @@ namespace RomanKeys
 
         private static void keyboard_KeyDown(object sender, GlobalKeyEventArgs e)
         {
-            switch (e.VirtualKeyCode)
-            {
-                case Keys.Up:
-                    if (e.ModifierKeys.Alt && e.ModifierKeys.Win)
-                    {
-                        Task.Run(() => Brightness.Step(up: true));
-                        e.Handled = true;
-                    }
-                    break;
-                case Keys.Down:
-                    if (e.ModifierKeys.Alt && e.ModifierKeys.Win)
-                    {
-                        Task.Run(() => Brightness.Step(up: false));
-                        e.Handled = true;
-                    }
-                    break;
-            }
+            foreach (var module in Program.Settings.Modules)
+                if (module.HandleKey((Key) e.VirtualKeyCode, e.ModifierKeys))
+                {
+                    e.Handled = true;
+                    return;
+                }
         }
     }
 }

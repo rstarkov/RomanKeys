@@ -41,6 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Brightness.cs" />
+    <Compile Include="Key.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Popups.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
