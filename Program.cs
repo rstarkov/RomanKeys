@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RT.Util;
@@ -21,12 +22,11 @@ namespace RomanKeys
 
             Classify.DefaultOptions.AddTypeOptions(typeof(Hotkey), new HotkeyTypeOptions());
             Classify.DefaultOptions.AddTypeOptions(typeof(TimeSpan), new TimeSpanTypeOptions());
+            Classify.DefaultOptions.AddTypeOptions(typeof(Color), new ColorTypeOptions());
             SettingsUtil.LoadSettings(out Settings);
 
             if (Settings.Modules.Count == 0)
-            {
                 Settings.Modules.Add(new BrightnessModule());
-            }
 
             Settings.Save();
 

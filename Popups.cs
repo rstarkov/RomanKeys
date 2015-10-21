@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using RT.Util;
 using RT.Util.Serialization;
 using RT.Util.Xml;
 
@@ -78,7 +79,7 @@ namespace RomanKeys
 
     enum PosRel { LeftOrTop, Center, RightOrBottom }
     enum PosUnits { Pixels, Percent }
-    enum PosScreen { Desktop, PrimaryScreen, Screen0, Screen1, Screen2, Screen3, Screen4, Screen5 };
+    enum PosScreen { Desktop, PrimaryScreen, ActiveScreen, Screen0, Screen1, Screen2, Screen3, Screen4, Screen5 };
     class Pos
     {
         public int Value = 0;
@@ -102,6 +103,17 @@ namespace RomanKeys
                     break;
                 case PosScreen.PrimaryScreen:
                     bounds = screens.Single(s => s.Primary).Bounds;
+                    break;
+                case PosScreen.ActiveScreen:
+                    WinAPI.RECT rect = new WinAPI.RECT();
+                    if (WinAPI.GetWindowRect(WinAPI.GetForegroundWindow(), ref rect))
+                        bounds = (screens.FirstOrDefault(scr => scr.Bounds.Contains((rect.Left + rect.Right) / 2, (rect.Top + rect.Bottom) / 2)) ?? screens.Single(s => s.Primary)).Bounds;
+                    else
+                    {
+                        Point pt;
+                        WinAPI.GetCursorPos(out pt);
+                        bounds = (screens.FirstOrDefault(scr => scr.Bounds.Contains(pt.X, pt.Y)) ?? screens.Single(s => s.Primary)).Bounds;
+                    }
                     break;
                 default:
                     bounds = screens[(int) Scr - (int) PosScreen.Screen0].Bounds;
@@ -133,15 +145,60 @@ namespace RomanKeys
 
     class RectanglePopup : PopupBase
     {
+        public Color BackgroundColor = Color.FromArgb(247, 15, 15, 15);
+        public Color BorderColor = Color.FromArgb(247, 255, 255, 255);
+
         [ClassifyIgnore]
-        private Brush _brushBackground = new SolidBrush(Color.FromArgb(247, 15, 15, 15));
+        private Brush _brushBackground;
         [ClassifyIgnore]
-        private Pen _penBorder = new Pen(Color.FromArgb(247, 255, 255, 255), 1);
+        private Pen _penBorder;
 
         protected override void Paint(Graphics g)
         {
+            if (_brushBackground == null)
+                _brushBackground = new SolidBrush(BackgroundColor);
+            if (_penBorder == null)
+                _penBorder = new Pen(BorderColor, 1);
+
             g.FillRectangle(_brushBackground, 0, 0, _form.Width, _form.Height);
             g.DrawRectangle(_penBorder, 1, 1, _form.Width - 3, _form.Height - 3);
+        }
+    }
+
+    class TextPopup : RectanglePopup, ICaptionedIndicator
+    {
+        public string Caption { get; set; }
+        public int Width = 200;
+        public int Height = 40;
+
+        public string FontFamily = "Segoe UI";
+        public double FontSize = 12;
+        public Color FontColor = Color.White;
+        public FontStyle FontStyle = FontStyle.Regular;
+
+        [ClassifyIgnore]
+        private Font _font;
+        [ClassifyIgnore]
+        private Brush _fontBrush;
+
+        protected override void DoDisplay()
+        {
+            _form.Width = Width;
+            _form.Height = Height;
+            base.DoDisplay();
+        }
+
+        protected override void Paint(Graphics g)
+        {
+            base.Paint(g);
+
+            if (_font == null)
+                _font = new Font(FontFamily, (float) FontSize, FontStyle);
+            if (_fontBrush == null)
+                _fontBrush = new SolidBrush(FontColor);
+
+            var size = g.MeasureString(Caption, _font);
+            g.DrawString(Caption, _font, _fontBrush, (_form.Width - size.Width) / 2, (_form.Height - size.Height) / 2);
         }
     }
 
