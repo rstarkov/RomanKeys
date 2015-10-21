@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using RT.Util.Serialization;
 using RT.Util.Xml;
 
 namespace RomanKeys
@@ -10,13 +12,17 @@ namespace RomanKeys
     abstract class PopupBase
     {
         public TimeSpan Timeout = TimeSpan.FromSeconds(1.2);
+        public PosRel HorzAnchor = PosRel.Center;
+        public PosRel VertAnchor = PosRel.RightOrBottom;
+        public Pos HorzPos = new Pos { Rel = PosRel.Center, Scr = PosScreen.PrimaryScreen };
+        public Pos VertPos = new Pos { Value = 90, Unit = PosUnits.Percent, Rel = PosRel.LeftOrTop, Scr = PosScreen.PrimaryScreen };
 
-        [XmlIgnore]
+        [ClassifyIgnore]
         private DateTime _disappearAt;
 
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Timer _timer;
-        [XmlIgnore]
+        [ClassifyIgnore]
         protected AlphaBlendedForm _form;
 
         protected abstract void Paint(Graphics graphics);
@@ -30,11 +36,15 @@ namespace RomanKeys
             _timer.Tick += TimerTick;
         }
 
-        public virtual void Display()
+        public void Display()
         {
-            var rect = Screen.PrimaryScreen.Bounds;
-            _form.Left = (rect.Left + rect.Right - _form.Width) / 2;
-            _form.Top = (int) (rect.Top + (rect.Bottom - rect.Top) * 0.9 - _form.Height);
+            _form.Invoke((Action) DoDisplay);
+        }
+
+        protected virtual void DoDisplay()
+        {
+            _form.Left = HorzPos.Calculate(HorzAnchor, _form.Width, true);
+            _form.Top = VertPos.Calculate(VertAnchor, _form.Height, false);
             _timer.Enabled = true;
             _disappearAt = DateTime.UtcNow + Timeout;
             _form.Refresh();
@@ -66,11 +76,66 @@ namespace RomanKeys
         #endregion
     }
 
+    enum PosRel { LeftOrTop, Center, RightOrBottom }
+    enum PosUnits { Pixels, Percent }
+    enum PosScreen { Desktop, PrimaryScreen, Screen0, Screen1, Screen2, Screen3, Screen4, Screen5 };
+    class Pos
+    {
+        public int Value = 0;
+        public PosUnits Unit = PosUnits.Pixels;
+        public PosRel Rel;
+        public PosScreen Scr;
+        public bool WorkingAreaOnly = false;
+
+        public int Calculate(PosRel anchor, int widthOrHeight, bool horizontal)
+        {
+            Rectangle bounds;
+            var screens = Screen.AllScreens;
+            switch (Scr)
+            {
+                case PosScreen.Desktop:
+                    int minX = screens.Min(s => (WorkingAreaOnly ? s.WorkingArea : s.Bounds).Left);
+                    int minY = screens.Min(s => (WorkingAreaOnly ? s.WorkingArea : s.Bounds).Top);
+                    int maxX = screens.Max(s => (WorkingAreaOnly ? s.WorkingArea : s.Bounds).Right);
+                    int maxY = screens.Max(s => (WorkingAreaOnly ? s.WorkingArea : s.Bounds).Bottom);
+                    bounds = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+                    break;
+                case PosScreen.PrimaryScreen:
+                    bounds = screens.Single(s => s.Primary).Bounds;
+                    break;
+                default:
+                    bounds = screens[(int) Scr - (int) PosScreen.Screen0].Bounds;
+                    break;
+            }
+            int screenPos = horizontal ? bounds.Left : bounds.Top;
+            int screenWidthOrHeight = horizontal ? bounds.Width : bounds.Height;
+
+            double result = screenPos;
+            switch (Rel)
+            {
+                case PosRel.LeftOrTop: result += 0; break;
+                case PosRel.Center: result += screenWidthOrHeight / 2.0; break;
+                case PosRel.RightOrBottom: result += screenWidthOrHeight; break;
+                default: throw new Exception();
+            }
+            switch (anchor)
+            {
+                case PosRel.LeftOrTop: result -= 0; break;
+                case PosRel.Center: result -= widthOrHeight / 2.0; break;
+                case PosRel.RightOrBottom: result -= widthOrHeight; break;
+                default: throw new Exception();
+            }
+            result += Value * (Unit == PosUnits.Pixels ? 1.0 : (screenWidthOrHeight / 100.0));
+
+            return (int) Math.Round(result);
+        }
+    }
+
     class RectanglePopup : PopupBase
     {
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Brush _brushBackground = new SolidBrush(Color.FromArgb(247, 15, 15, 15));
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Pen _penBorder = new Pen(Color.FromArgb(247, 255, 255, 255), 1);
 
         protected override void Paint(Graphics g)
@@ -84,20 +149,20 @@ namespace RomanKeys
     {
         public string Caption { get; set; }
 
-        [XmlIgnore]
+        [ClassifyIgnore]
         public int Value { get; set; }
-        [XmlIgnore]
+        [ClassifyIgnore]
         public int MaxValue { get; set; }
 
-        [XmlIgnore]
+        [ClassifyIgnore]
         private int _windowBorder, _barBorder;
-        [XmlIgnore]
+        [ClassifyIgnore]
         private int _barWidth;
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Brush _brushBarOn = new SolidBrush(Color.FromArgb(61, 148, 255));
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Brush _brushBarOff = new SolidBrush(Color.FromArgb(50, 50, 50));
-        [XmlIgnore]
+        [ClassifyIgnore]
         private Font _fontCaption = new Font("Segoe UI", 12);
 
         public BarPopup()
@@ -109,12 +174,7 @@ namespace RomanKeys
             _form.Height = 70;
         }
 
-        void IValueIndicator.Display()
-        {
-            _form.Invoke((Action) Display);
-        }
-
-        public override void Display()
+        protected override void DoDisplay()
         {
             _windowBorder = 12;
             _barBorder = 3;
@@ -130,7 +190,7 @@ namespace RomanKeys
 
             _form.Width = 2 * _windowBorder + (MaxValue + 1) * _barBorder + MaxValue * _barWidth;
 
-            base.Display();
+            base.DoDisplay();
         }
 
         protected override void Paint(Graphics g)

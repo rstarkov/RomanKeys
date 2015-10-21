@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RT.Util;
-using RT.Util.Xml;
+using RT.Util.Serialization;
 
 namespace RomanKeys
 {
@@ -16,7 +16,7 @@ namespace RomanKeys
 
     interface IModule
     {
-        bool HandleKey(Hotkey key);
+        bool HandleKey(Hotkey key, bool down);
     }
 
     interface IValueIndicator
@@ -26,7 +26,7 @@ namespace RomanKeys
         void Display();
     }
 
-    class HotkeyTypeOptions : XmlClassifyTypeOptions, IXmlClassifySubstitute<Hotkey, string>
+    class HotkeyTypeOptions : ClassifyTypeOptions, IClassifySubstitute<Hotkey, string>
     {
         public string ToSubstitute(Hotkey instance)
         {
@@ -39,7 +39,7 @@ namespace RomanKeys
         }
     }
 
-    class TimeSpanTypeOptions : XmlClassifyTypeOptions, IXmlClassifySubstitute<TimeSpan, decimal>
+    class TimeSpanTypeOptions : ClassifyTypeOptions, IClassifySubstitute<TimeSpan, decimal>
     {
         public decimal ToSubstitute(TimeSpan instance)
         {

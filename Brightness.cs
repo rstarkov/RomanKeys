@@ -13,13 +13,14 @@ namespace RomanKeys
         public Hotkey HotkeyBrighter = new Hotkey(Key.Up, alt: true, win: true);
         public Hotkey HotkeyDarker = new Hotkey(Key.Down, alt: true, win: true);
 
-        public bool HandleKey(Hotkey key)
+        public bool HandleKey(Hotkey key, bool down)
         {
             bool up = key == HotkeyBrighter;
             bool dn = key == HotkeyDarker;
             if (up || dn)
             {
-                Task.Run(() => { step(up); });
+                if (down)
+                    Task.Run(() => { step(up); });
                 return true;
             }
             return false;
