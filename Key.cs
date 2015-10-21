@@ -44,7 +44,7 @@ namespace RomanKeys
 
         public override string ToString()
         {
-            return (Modifiers.Ctrl ? "Ctrl+" : "") + (Modifiers.Alt ? "Alt+" : "") + (Modifiers.Shift ? "Shift+" : "") + (Modifiers.Win ? "Win+" : "") + Key.ToString();
+            return (Modifiers.Ctrl ? "Ctrl+" : "") + (Modifiers.Alt ? "Alt+" : "") + (Modifiers.Shift ? "Shift+" : "") + (Modifiers.Win ? "Win+" : "") + ToNiceKeyString(Key);
         }
 
         public static Hotkey Parse(string str)
@@ -64,7 +64,22 @@ namespace RomanKeys
                 else
                     throw new ArgumentException("Cannot parse Hotkey part: “" + parts[i] + "”");
             }
-            return new Hotkey(EnumStrong.Parse<Key>(parts[parts.Length - 1], true), new ModifierKeysState(ctrl, alt, shift, win));
+            return new Hotkey(ParseNiceKeyString(parts[parts.Length - 1]), new ModifierKeysState(ctrl, alt, shift, win));
+        }
+
+        public static Key ParseNiceKeyString(string str)
+        {
+            int result;
+            if (int.TryParse(str, out result) && result >= 0 && result <= 9)
+                return result + Key.D0;
+            return EnumStrong.Parse<Key>(str, true);
+        }
+
+        public static string ToNiceKeyString(Key key)
+        {
+            if (key >= Key.D0 && key <= Key.D9)
+                return ((int) key - (int) Key.D0).ToString();
+            return key.ToString();
         }
     }
 
@@ -151,16 +166,16 @@ namespace RomanKeys
         RWin = 92,
         Apps = 93,
         Sleep = 95,
-        NumPad0 = 96,
-        NumPad1 = 97,
-        NumPad2 = 98,
-        NumPad3 = 99,
-        NumPad4 = 100,
-        NumPad5 = 101,
-        NumPad6 = 102,
-        NumPad7 = 103,
-        NumPad8 = 104,
-        NumPad9 = 105,
+        Num0 = 96,
+        Num1 = 97,
+        Num2 = 98,
+        Num3 = 99,
+        Num4 = 100,
+        Num5 = 101,
+        Num6 = 102,
+        Num7 = 103,
+        Num8 = 104,
+        Num9 = 105,
         NumMultiply = 106,
         NumAdd = 107,
         NumSeparator = 108,

@@ -110,8 +110,8 @@ namespace RomanKeys
         {
             if (key >= Key.D0 && key <= Key.D9)
                 return key.ToString().Replace("D", "");
-            if (key >= Key.NumPad0 && key <= Key.NumPad9)
-                return key.ToString().Replace("NumPad", "Num ");
+            if (key >= Key.Num0 && key <= Key.Num9)
+                return key.ToString().Replace("Num", "Num ");
             switch (key)
             {
                 case Key.OemSemicolon: return ";";
