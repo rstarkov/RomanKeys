@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyboardLayout.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PressedKeyMonitor.cs" />
     <Compile Include="Brightness.cs" />
     <Compile Include="Key.cs">
