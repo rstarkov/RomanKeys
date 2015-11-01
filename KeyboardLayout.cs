@@ -35,7 +35,7 @@ namespace RomanKeys
                         selected = layouts.FirstOrDefault(li => Regex.IsMatch(li.Name, Layouts[i].LayoutNameRegex));
                     if (selected != null)
                     {
-                        WinAPI.PostMessage(WinAPI.GetForegroundWindow(), 0x0050, IntPtr.Zero, selected.Ptr);
+                        WinAPI.PostMessage(WinAPI.GetForegroundWindow(), 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, IntPtr.Zero, selected.Ptr);
                         if (Layouts[i].Indicator != null)
                         {
                             Layouts[i].Indicator.Caption = Layouts[i].DisplayName ?? selected.Name;
