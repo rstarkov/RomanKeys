@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using RT.Serialization;
+﻿using RT.Serialization;
 
 namespace RomanKeys
 {

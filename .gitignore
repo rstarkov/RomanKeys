@@ -1,9 +1,4 @@
 *.csproj.user
-*.sln.cache
-*.suo
-bin
-obj
-builds
-*.orig
+Builds
+.vs
 .idea
-packages

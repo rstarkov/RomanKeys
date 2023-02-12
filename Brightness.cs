@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Management;
-using System.Threading.Tasks;
+﻿using System.Management;
 using RT.Util.ExtensionMethods;
 
 namespace RomanKeys
@@ -33,7 +30,7 @@ namespace RomanKeys
             using (var moGet = firstThenDispose(mcGet.GetInstances()))
             using (var moSet = firstThenDispose(mcSet.GetInstances()))
             {
-                var levels = ((byte[]) moGet.GetPropertyValue("Level")).Order().ToList();
+                var levels = ((byte[]) moGet.GetPropertyValue("Level")).OrderBy(b => b).ToList();
                 var brightness = (byte) moGet.GetPropertyValue("CurrentBrightness");
 
                 var index = levels.IndexOf(lvl => brightness <= lvl);

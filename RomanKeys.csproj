@@ -1,106 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C7EE2720-B0EF-4095-A38F-D605D9E5D57A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RomanKeys</RootNamespace>
-    <AssemblyName>RomanKeys</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <OutputPath>builds\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>builds\$(Configuration)\obj-$(AssemblyName)\</IntermediateOutputPath>
-    <BaseIntermediateOutputPath>builds\$(Configuration)\obj-$(AssemblyName)\</BaseIntermediateOutputPath>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="RT.Json, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Json.2.0.1724\lib\netstandard2.0\RT.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.PostBuild, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.PostBuild.2.0.1724\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Serialization, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.2.0.1724\lib\netstandard2.0\RT.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Serialization.Binary, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Binary.2.0.1724\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Serialization.Json, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Json.2.0.1724\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Serialization.Xml, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Serialization.Xml.2.0.1724\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Util, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Util.2.0.1724\lib\net472\RT.Util.dll</HintPath>
-    </Reference>
-    <Reference Include="RT.Util.Core, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\RT.Util.Core.2.0.1724\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
+    <PackageReference Include="RT.Serialization.Xml" Version="2.0.1724" />
+    <PackageReference Include="RT.Serialization.Json" Version="2.0.1724" />
+    <PackageReference Include="RT.Util" Version="2.0.1724" />
+    <PackageReference Include="RT.Util.Core" Version="2.0.1724" />
+    <PackageReference Include="System.Management" Version="7.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="KeyboardLayout.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PressedKeyMonitor.cs" />
-    <Compile Include="Brightness.cs" />
-    <Compile Include="Key.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Popups.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AlphaBlendedForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

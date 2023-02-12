@@ -1,11 +1,8 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
+﻿using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using RT.Serialization;
 using RT.Util;
+using Timer = System.Windows.Forms.Timer;
 
 namespace RomanKeys
 {
