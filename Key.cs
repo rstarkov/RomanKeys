@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using RT.Util;
 using RT.Util.ExtensionMethods;
-using RT.Util.Xml;
 
 namespace RomanKeys
 {
@@ -53,13 +51,13 @@ namespace RomanKeys
             bool ctrl = false, alt = false, shift = false, win = false;
             for (int i = 0; i < parts.Length - 1; i++)
             {
-                if (parts[i].EqualsNoCase("Ctrl"))
+                if (parts[i].EqualsIgnoreCase("Ctrl"))
                     ctrl = true;
-                else if (parts[i].EqualsNoCase("Alt"))
+                else if (parts[i].EqualsIgnoreCase("Alt"))
                     alt = true;
-                else if (parts[i].EqualsNoCase("Shift"))
+                else if (parts[i].EqualsIgnoreCase("Shift"))
                     shift = true;
-                else if (parts[i].EqualsNoCase("Win"))
+                else if (parts[i].EqualsIgnoreCase("Win"))
                     win = true;
                 else
                     throw new ArgumentException("Cannot parse Hotkey part: “" + parts[i] + "”");

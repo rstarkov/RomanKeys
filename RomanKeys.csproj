@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RomanKeys</RootNamespace>
     <AssemblyName>RomanKeys</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <OutputPath>builds\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>builds\$(Configuration)\obj-$(AssemblyName)\</IntermediateOutputPath>
@@ -30,6 +30,32 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="RT.Json, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Json.2.0.1724\lib\netstandard2.0\RT.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.PostBuild, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.PostBuild.2.0.1724\lib\netstandard2.0\RT.PostBuild.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Serialization.2.0.1724\lib\netstandard2.0\RT.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization.Binary, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Serialization.Binary.2.0.1724\lib\netstandard2.0\RT.Serialization.Binary.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization.Json, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Serialization.Json.2.0.1724\lib\netstandard2.0\RT.Serialization.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Serialization.Xml, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Serialization.Xml.2.0.1724\lib\netstandard2.0\RT.Serialization.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Util, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Util.2.0.1724\lib\net472\RT.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="RT.Util.Core, Version=2.0.1724.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\RT.Util.Core.2.0.1724\lib\netstandard2.0\RT.Util.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -38,6 +64,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeyboardLayout.cs">
@@ -66,10 +93,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\common\Util\Util.csproj">
-      <Project>{8d0fe79c-ad8d-475c-9e6f-9cae85365b5d}</Project>
-      <Name>Util</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

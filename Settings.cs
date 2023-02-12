@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using RT.Serialization;
 using RT.Util;
 using RT.Util.ExtensionMethods;
-using RT.Util.Serialization;
 
 namespace RomanKeys
 {
@@ -35,7 +35,7 @@ namespace RomanKeys
         int MaxValue { get; set; }
     }
 
-    class HotkeyTypeOptions : ClassifyTypeOptions, IClassifySubstitute<Hotkey, string>
+    class HotkeyTypeOptions : IClassifySubstitute<Hotkey, string>
     {
         public string ToSubstitute(Hotkey instance)
         {
@@ -48,7 +48,7 @@ namespace RomanKeys
         }
     }
 
-    class TimeSpanTypeOptions : ClassifyTypeOptions, IClassifySubstitute<TimeSpan, decimal>
+    class TimeSpanTypeOptions : IClassifySubstitute<TimeSpan, decimal>
     {
         public decimal ToSubstitute(TimeSpan instance)
         {
@@ -61,7 +61,7 @@ namespace RomanKeys
         }
     }
 
-    class ColorTypeOptions : ClassifyTypeOptions, IClassifySubstitute<Color, string>
+    class ColorTypeOptions : IClassifySubstitute<Color, string>
     {
         Color IClassifySubstitute<Color, string>.FromSubstitute(string instance) { return FromSubstituteD(instance); }
         private Color FromSubstituteD(string instance)

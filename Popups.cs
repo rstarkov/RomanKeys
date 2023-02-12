@@ -4,9 +4,8 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using RT.Serialization;
 using RT.Util;
-using RT.Util.Serialization;
-using RT.Util.Xml;
 
 namespace RomanKeys
 {

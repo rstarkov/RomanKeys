@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
-using RT.Util;
 using RT.Util.ExtensionMethods;
 
 namespace RomanKeys

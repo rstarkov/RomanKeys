@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Drawing;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using RT.Serialization;
 using RT.Util;
-using RT.Util.Serialization;
-using RT.Util.Xml;
 
 namespace RomanKeys
 {
@@ -20,9 +17,9 @@ namespace RomanKeys
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            Classify.DefaultOptions.AddTypeOptions(typeof(Hotkey), new HotkeyTypeOptions());
-            Classify.DefaultOptions.AddTypeOptions(typeof(TimeSpan), new TimeSpanTypeOptions());
-            Classify.DefaultOptions.AddTypeOptions(typeof(Color), new ColorTypeOptions());
+            Classify.DefaultOptions.AddTypeSubstitution(new HotkeyTypeOptions());
+            Classify.DefaultOptions.AddTypeSubstitution(new TimeSpanTypeOptions());
+            Classify.DefaultOptions.AddTypeSubstitution(new ColorTypeOptions());
             SettingsUtil.LoadSettings(out Settings);
 
             if (Settings.Modules.Count == 0)
