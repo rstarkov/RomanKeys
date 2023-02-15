@@ -4,8 +4,11 @@ namespace RomanKeys;
 
 class PressedKeyMonitorModule : IModule, IEnumerable<PressedKeyMonitorModule.Evt>
 {
+    public Hotkey ToggleHotkey = new(Key.Q, ctrl: true, alt: true, shift: true, win: true);
     public ScrollingTextPopup Indicator = new();
 
+    [ClassifyIgnore]
+    private bool _enabled = false;
     [ClassifyIgnore]
     private Evt[] _events = new Evt[50];
     [ClassifyIgnore]
@@ -21,8 +24,20 @@ class PressedKeyMonitorModule : IModule, IEnumerable<PressedKeyMonitorModule.Evt
 
     public bool HandleKey(Hotkey key, bool down)
     {
+        bool consume = false;
+        if (down && key == ToggleHotkey)
+        {
+            consume = true;
+            _enabled = !_enabled;
+            for (int i = 0; i < _events.Length; i++)
+                _events[i] = null;
+            if (!_enabled)
+                Indicator.Hide();
+        }
+        if (!_enabled)
+            return consume;
         if (down && _isDown.ContainsKey(key.Key) && _isDown[key.Key])
-            return false; // autorepeat - we ignore these
+            return consume; // autorepeat - we ignore these
         else if (_events[_lastEvent] != null && _events[_lastEvent].Key == key.Key && _events[_lastEvent].Down == true && !down)
             _events[_lastEvent].Down = null; // it's a full press
         else
@@ -36,7 +51,7 @@ class PressedKeyMonitorModule : IModule, IEnumerable<PressedKeyMonitorModule.Evt
             Indicator.Events = this;
             Indicator.Display();
         });
-        return false;
+        return consume;
     }
 
     public IEnumerator<PressedKeyMonitorModule.Evt> GetEnumerator()

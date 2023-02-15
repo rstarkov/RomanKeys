@@ -37,7 +37,12 @@ abstract class PopupBase
 
     public void Display()
     {
-        _form.Invoke((Action) DoDisplay);
+        _form.Invoke(DoDisplay);
+    }
+
+    public void Hide()
+    {
+        _form.Invoke(_form.Hide);
     }
 
     private void DoDisplay()
