@@ -24,7 +24,7 @@ class AlphaBlendedForm : Form
         ShowInTaskbar = false;
         TopMost = true;
         ClickHandling = ClickAction.ClickThrough;
-        AutoScaleMode = AutoScaleMode.None;
+        AutoScaleMode = AutoScaleMode.Dpi;
         Width = 200; // the caller is expected to set this as desired, but initialize to something sensible
         Height = 100;
 
@@ -66,10 +66,13 @@ class AlphaBlendedForm : Form
         try
         {
             using var bmp = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
+            bmp.SetResolution(DeviceDpi, DeviceDpi);
             hBitmap = bmp.GetHbitmap(Color.FromArgb(0));
             hBitmapOld = SelectObject(dcMem, hBitmap);
-            using (var graphics = Graphics.FromHdc(dcMem))
+            using (var graphics = Graphics.FromImage(bmp))
                 OnPaint(new PaintEventArgs(graphics, ClientRectangle));
+            using (var graphics = Graphics.FromHdc(dcMem))
+                graphics.DrawImage(bmp, 0, 0, Width, Height);
 
             var size = bmp.Size;
             var pointSource = new Point(0, 0);
@@ -149,6 +152,9 @@ class AlphaBlendedForm : Form
 
     [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
     private static extern bool DeleteObject(IntPtr hObject);
+
+    [DllImport("gdi32.dll", EntryPoint = "BitBlt", SetLastError = true)]
+    static extern bool BitBlt([In] IntPtr hdc, int nXDest, int nYDest, int nWidth, int nHeight, [In] IntPtr hdcSrc, int nXSrc, int nYSrc, uint dwRop);
 
     #endregion
 }

@@ -1,4 +1,6 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using RT.Serialization;
 using RT.Util;
 using Timer = System.Windows.Forms.Timer;
@@ -43,8 +45,8 @@ abstract class PopupBase
         var size = GetSize();
         _form.Left = HorzPos.Calculate(HorzAnchor, size.Width, true);
         _form.Top = VertPos.Calculate(VertAnchor, size.Height, false);
-        _form.Width = size.Width;
-        _form.Height = size.Height;
+        _form.Width = size.Width * _form.DeviceDpi / 96;
+        _form.Height = size.Height * _form.DeviceDpi / 96;
         _timer.Enabled = true;
         _disappearAt = DateTime.UtcNow + Timeout;
         _form.Refresh();
@@ -76,6 +78,7 @@ class Pos
     {
         Rectangle bounds;
         var screens = Screen.AllScreens;
+        var dpiForScreen = Screen.PrimaryScreen;
         switch (Scr)
         {
             case PosScreen.Desktop:
@@ -91,19 +94,24 @@ class Pos
             case PosScreen.ActiveScreen:
                 var rect = new WinAPI.RECT();
                 if (WinAPI.GetWindowRect(WinAPI.GetForegroundWindow(), ref rect))
-                    bounds = (screens.FirstOrDefault(scr => scr.Bounds.Contains((rect.Left + rect.Right) / 2, (rect.Top + rect.Bottom) / 2)) ?? screens.Single(s => s.Primary)).Bounds;
+                    dpiForScreen = screens.FirstOrDefault(scr => scr.Bounds.Contains((rect.Left + rect.Right) / 2, (rect.Top + rect.Bottom) / 2)) ?? screens.Single(s => s.Primary);
                 else
                 {
                     WinAPI.GetCursorPos(out Point pt);
-                    bounds = (screens.FirstOrDefault(scr => scr.Bounds.Contains(pt.X, pt.Y)) ?? screens.Single(s => s.Primary)).Bounds;
+                    dpiForScreen = screens.FirstOrDefault(scr => scr.Bounds.Contains(pt.X, pt.Y)) ?? screens.Single(s => s.Primary);
                 }
+                bounds = dpiForScreen.Bounds;
                 break;
             default:
-                bounds = screens[(int) Scr - (int) PosScreen.Screen0].Bounds;
+                dpiForScreen = screens[(int) Scr - (int) PosScreen.Screen0];
+                bounds = dpiForScreen.Bounds;
                 break;
         }
         int screenPos = horizontal ? bounds.Left : bounds.Top;
         int screenWidthOrHeight = horizontal ? bounds.Width : bounds.Height;
+        var hmon = MonitorFromPoint(new Point(dpiForScreen.Bounds.X + dpiForScreen.Bounds.Width / 2, dpiForScreen.Bounds.Y + dpiForScreen.Bounds.Height / 2), 2 /* MONITOR_DEFAULTTONEAREST */);
+        GetDpiForMonitor(hmon, 0 /* MDT_EFFECTIVE_DPI */, out var dpi, out _);
+        widthOrHeight = widthOrHeight * (int) dpi / 96;
 
         double result = screenPos;
         result += Rel switch
@@ -120,10 +128,15 @@ class Pos
             PosRel.RightOrBottom => widthOrHeight,
             _ => throw new Exception(),
         };
-        result += Value * (Unit == PosUnits.Pixels ? 1.0 : (screenWidthOrHeight / 100.0));
+        result += Value * (Unit == PosUnits.Pixels ? dpi / 96.0 : (screenWidthOrHeight / 100.0));
 
         return (int) Math.Round(result);
     }
+
+    [DllImport("shcore.dll")]
+    private static extern uint GetDpiForMonitor(nint hmonitor, uint dpiType, out uint dpiX, out uint dpiY);
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr MonitorFromPoint(Point pt, uint dwFlags);
 }
 
 abstract class RectanglePopup : PopupBase
