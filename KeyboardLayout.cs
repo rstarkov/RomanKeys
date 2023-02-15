@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using RT.Util;
@@ -32,7 +33,7 @@ namespace RomanKeys
                         selected = layouts.FirstOrDefault(li => Regex.IsMatch(li.Name, Layouts[i].LayoutNameRegex));
                     if (selected != null)
                     {
-                        WinAPI.PostMessage(WinAPI.GetForegroundWindow(), 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, IntPtr.Zero, selected.Ptr);
+                        WinAPI.PostMessage(GetAncestor(WinAPI.GetForegroundWindow(), 3 /* GA_ROOTOWNER */), 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, 0, selected.Ptr);
                         if (Layouts[i].Indicator != null)
                         {
                             Layouts[i].Indicator.Caption = Layouts[i].DisplayName ?? selected.Name;
@@ -44,6 +45,9 @@ namespace RomanKeys
             }
             return false;
         }
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        static extern nint GetAncestor(nint hwnd, uint flags);
     }
 
     static class KeyboardLayouts
