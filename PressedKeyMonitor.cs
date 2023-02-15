@@ -84,28 +84,31 @@ class ScrollingTextPopup : RectanglePopup
         return new Size(Width, Height);
     }
 
-    protected override void Paint(System.Drawing.Graphics g)
+    protected override void Paint(Graphics g)
     {
         base.Paint(g);
-        int x = Width - 5;
-        int height = 0;
-        g.SetClip(new Rectangle(2, 2, _form.Width - 4, _form.Height - 4));
+        var dpiscale = g.DpiX / 96;
+        float sc(float v) => v * dpiscale;
+        float isc(float v) => v / dpiscale;
+        float x = Width - 5;
+        float height = 0;
+        g.SetClip(new RectangleF(sc(2), sc(2), sc(Width - 4), sc(Height - 4)));
         foreach (var evt in Events.Reverse())
         {
             var label = getKeyDisplay(evt.Key);
             var size = g.MeasureString(label, _font);
-            height = (int) size.Height;
-            x -= 7 + (int) size.Width + 7;
+            height = isc(size.Height);
+            x -= 7 + isc(size.Width) + 7;
             if (evt.Down == true)
-                g.FillRectangle(_backBrush, x, 5 + height - 3, 7 + (int) size.Width + 7, 3);
+                g.FillRectangle(_backBrush, sc(x), sc(5 + height - 3), sc(7 + 7) + size.Width, sc(3));
             else if (evt.Down == false)
-                g.FillRectangle(_backBrush, x, 5, 7 + (int) size.Width + 7, 3);
+                g.FillRectangle(_backBrush, sc(x), sc(5), sc(7 + 7) + size.Width, sc(3));
             else
-                g.FillRectangle(_backBrush, x, 5, 7 + (int) size.Width + 7, height);
-            g.DrawString(label, _font, Brushes.White, x + 7, 5);
+                g.FillRectangle(_backBrush, sc(x), sc(5), sc(7 + 7) + size.Width, sc(height));
+            g.DrawString(label, _font, Brushes.White, sc(x + 7), sc(5));
             x -= 4;
         }
-        _form.Height = Height = 5 + height + 5;
+        Height = (int) (5 + height + 5);
     }
 
     private string getKeyDisplay(Key key)
