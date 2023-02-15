@@ -33,7 +33,7 @@ namespace RomanKeys
                         selected = layouts.FirstOrDefault(li => Regex.IsMatch(li.Name, Layouts[i].LayoutNameRegex));
                     if (selected != null)
                     {
-                        WinAPI.PostMessage(GetAncestor(WinAPI.GetForegroundWindow(), 3 /* GA_ROOTOWNER */), 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, 0, selected.Ptr);
+                        SetKeyboardLayout(WinAPI.GetForegroundWindow(), selected.Ptr);
                         if (Layouts[i].Indicator != null)
                         {
                             Layouts[i].Indicator.Caption = Layouts[i].DisplayName ?? selected.Name;
@@ -46,8 +46,30 @@ namespace RomanKeys
             return false;
         }
 
+        private void SetKeyboardLayout(nint hWnd, nint hLayout)
+        {
+            hWnd = GetAncestor(hWnd, 3 /* GA_ROOTOWNER */); // support changing layout for dialogs like Save As and Win+R "Run"
+            var buf = new StringBuilder(256);
+            GetClassName(hWnd, buf, buf.Capacity);
+            if (buf.ToString() == "#32770") // support changing layout for top-level dialogs such as PuTTY: https://stackoverflow.com/a/51118612/33080
+                EnumChildWindows(hWnd, postChangeToChildProc, hLayout);
+            else
+                WinAPI.PostMessage(hWnd, 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, 0, hLayout);
+
+            bool postChangeToChildProc(nint hwnd, nint lParam)
+            {
+                WinAPI.PostMessage(hwnd, 0x0050 /* WM_INPUTLANGCHANGEREQUEST */, 0, lParam);
+                return true;
+            }
+        }
+
         [DllImport("user32.dll", ExactSpelling = true)]
         static extern nint GetAncestor(nint hwnd, uint flags);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
+        delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
+        [DllImport("user32.dll")]
+        static extern bool EnumChildWindows(IntPtr hwndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
     }
 
     static class KeyboardLayouts
