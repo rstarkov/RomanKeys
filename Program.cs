@@ -1,55 +1,54 @@
 ﻿using RT.Serialization;
 using RT.Util;
 
-namespace RomanKeys
+namespace RomanKeys;
+
+static class Program
 {
-    static class Program
+    public static Settings Settings;
+
+    private static GlobalKeyboardListener _keyboard;
+
+    [STAThread]
+    static void Main()
     {
-        public static Settings Settings;
+        ApplicationConfiguration.Initialize();
 
-        private static GlobalKeyboardListener _keyboard;
+        Classify.DefaultOptions.AddTypeSubstitution(new HotkeyTypeOptions());
+        Classify.DefaultOptions.AddTypeSubstitution(new TimeSpanTypeOptions());
+        Classify.DefaultOptions.AddTypeSubstitution(new ColorTypeOptions());
+        SettingsUtil.LoadSettings(out Settings);
 
-        [STAThread]
-        static void Main()
-        {
-            ApplicationConfiguration.Initialize();
+        if (Settings.Modules.Count == 0)
+            Settings.Modules.Add(new BrightnessModule());
 
-            Classify.DefaultOptions.AddTypeSubstitution(new HotkeyTypeOptions());
-            Classify.DefaultOptions.AddTypeSubstitution(new TimeSpanTypeOptions());
-            Classify.DefaultOptions.AddTypeSubstitution(new ColorTypeOptions());
-            SettingsUtil.LoadSettings(out Settings);
+        Settings.Save();
 
-            if (Settings.Modules.Count == 0)
-                Settings.Modules.Add(new BrightnessModule());
+        _keyboard = new GlobalKeyboardListener();
+        _keyboard.HookAllKeys = true;
+        _keyboard.KeyDown += keyboard_KeyDown;
+        _keyboard.KeyUp += keyboard_KeyUp;
 
-            Settings.Save();
+        Application.Run();
+    }
 
-            _keyboard = new GlobalKeyboardListener();
-            _keyboard.HookAllKeys = true;
-            _keyboard.KeyDown += keyboard_KeyDown;
-            _keyboard.KeyUp += keyboard_KeyUp;
+    private static void keyboard_KeyDown(object sender, GlobalKeyEventArgs e)
+    {
+        foreach (var module in Program.Settings.Modules)
+            if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), true))
+            {
+                e.Handled = true;
+                return;
+            }
+    }
 
-            Application.Run();
-        }
-
-        private static void keyboard_KeyDown(object sender, GlobalKeyEventArgs e)
-        {
-            foreach (var module in Program.Settings.Modules)
-                if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), true))
-                {
-                    e.Handled = true;
-                    return;
-                }
-        }
-
-        private static void keyboard_KeyUp(object sender, GlobalKeyEventArgs e)
-        {
-            foreach (var module in Program.Settings.Modules)
-                if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), false))
-                {
-                    e.Handled = true;
-                    return;
-                }
-        }
+    private static void keyboard_KeyUp(object sender, GlobalKeyEventArgs e)
+    {
+        foreach (var module in Program.Settings.Modules)
+            if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), false))
+            {
+                e.Handled = true;
+                return;
+            }
     }
 }
