@@ -24,6 +24,7 @@ namespace RomanKeys
             ShowInTaskbar = false;
             TopMost = true;
             ClickHandling = ClickAction.ClickThrough;
+            AutoScaleMode = AutoScaleMode.None;
             Width = 200; // the caller is expected to set this as desired, but initialize to something sensible
             Height = 100;
 

@@ -12,8 +12,7 @@ namespace RomanKeys
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            ApplicationConfiguration.Initialize();
 
             Classify.DefaultOptions.AddTypeSubstitution(new HotkeyTypeOptions());
             Classify.DefaultOptions.AddTypeSubstitution(new TimeSpanTypeOptions());

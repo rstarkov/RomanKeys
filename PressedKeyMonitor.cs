@@ -64,11 +64,9 @@ namespace RomanKeys
         [ClassifyIgnore]
         public IEnumerable<PressedKeyMonitorModule.Evt> Events;
 
-        protected override void DoDisplay()
+        protected override Size GetSize()
         {
-            _form.Width = Width;
-            _form.Height = Height;
-            base.DoDisplay();
+            return new Size(Width, Height);
         }
 
         protected override void Paint(System.Drawing.Graphics g)

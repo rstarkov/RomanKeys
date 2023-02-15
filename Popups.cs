@@ -1,5 +1,4 @@
 ﻿using System.Drawing.Drawing2D;
-using System.Runtime.InteropServices;
 using RT.Serialization;
 using RT.Util;
 using Timer = System.Windows.Forms.Timer;
@@ -22,6 +21,7 @@ namespace RomanKeys
         [ClassifyIgnore]
         protected AlphaBlendedForm _form;
 
+        protected abstract Size GetSize();
         protected abstract void Paint(Graphics graphics);
 
         public PopupBase()
@@ -38,15 +38,17 @@ namespace RomanKeys
             _form.Invoke((Action) DoDisplay);
         }
 
-        protected virtual void DoDisplay()
+        private void DoDisplay()
         {
-            _form.Left = HorzPos.Calculate(HorzAnchor, _form.Width, true);
-            _form.Top = VertPos.Calculate(VertAnchor, _form.Height, false);
+            var size = GetSize();
+            _form.Left = HorzPos.Calculate(HorzAnchor, size.Width, true);
+            _form.Top = VertPos.Calculate(VertAnchor, size.Height, false);
+            _form.Width = size.Width;
+            _form.Height = size.Height;
             _timer.Enabled = true;
             _disappearAt = DateTime.UtcNow + Timeout;
             _form.Refresh();
-            ShowWindow(_form.Handle, SW_SHOWNOACTIVATE);
-            SetWindowPos(_form.Handle.ToInt32(), HWND_TOPMOST, _form.Left, _form.Top, _form.Width, _form.Height, SWP_NOACTIVATE);
+            _form.Show();
         }
 
         void TimerTick(object sender, EventArgs e)
@@ -57,20 +59,6 @@ namespace RomanKeys
                 _timer.Enabled = false;
             }
         }
-
-        #region WinAPI
-
-        private const int SW_SHOWNOACTIVATE = 4;
-        private const int HWND_TOPMOST = -1;
-        private const uint SWP_NOACTIVATE = 0x0010;
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-        static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        #endregion
     }
 
     enum PosRel { LeftOrTop, Center, RightOrBottom }
@@ -139,7 +127,7 @@ namespace RomanKeys
         }
     }
 
-    class RectanglePopup : PopupBase
+    abstract class RectanglePopup : PopupBase
     {
         public Color BackgroundColor = Color.FromArgb(247, 15, 15, 15);
         public Color BorderColor = Color.FromArgb(247, 255, 255, 255);
@@ -177,11 +165,9 @@ namespace RomanKeys
         [ClassifyIgnore]
         private Brush _fontBrush;
 
-        protected override void DoDisplay()
+        protected override Size GetSize()
         {
-            _form.Width = Width;
-            _form.Height = Height;
-            base.DoDisplay();
+            return new Size(Width, Height);
         }
 
         protected override void Paint(Graphics g)
@@ -223,17 +209,18 @@ namespace RomanKeys
             Caption = "Popup";
             Value = 3;
             MaxValue = 5;
-            _form.Width = 330;
-            _form.Height = 70;
         }
 
-        protected override void DoDisplay()
+        protected override Size GetSize()
         {
+            var width = 330;
+            var height = 70;
+
             _windowBorder = 12;
             _barBorder = 3;
             while (true)
             {
-                _barWidth = (_form.Width - 2 * _windowBorder - (MaxValue + 1) * _barBorder) / MaxValue;
+                _barWidth = (width - 2 * _windowBorder - (MaxValue + 1) * _barBorder) / MaxValue;
                 if (_barWidth >= 1.8 * _barBorder || _barBorder == 0)
                     break;
                 _barBorder--;
@@ -241,9 +228,9 @@ namespace RomanKeys
             if (_barWidth <= 0)
                 _barWidth = 1;
 
-            _form.Width = 2 * _windowBorder + (MaxValue + 1) * _barBorder + MaxValue * _barWidth;
+            width = 2 * _windowBorder + (MaxValue + 1) * _barBorder + MaxValue * _barWidth;
 
-            base.DoDisplay();
+            return new Size(width, height);
         }
 
         protected override void Paint(Graphics g)
