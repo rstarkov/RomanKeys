@@ -10,11 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RT.Serialization.Xml" Version="2.0.1724" />
-    <PackageReference Include="RT.Serialization.Json" Version="2.0.1724" />
-    <PackageReference Include="RT.Util" Version="2.0.1724" />
-    <PackageReference Include="RT.Util.Core" Version="2.0.1724" />
-    <PackageReference Include="System.Management" Version="7.0.0" />
+    <PackageReference Include="RT.Serialization.Xml" Version="2.0.1737" />
+    <PackageReference Include="RT.Util" Version="2.0.1737" />
+    <PackageReference Include="RT.Util.Core" Version="2.0.1737" />
+    <PackageReference Include="System.Management" Version="7.0.1" />
   </ItemGroup>
 
 </Project>

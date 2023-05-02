@@ -1,11 +1,12 @@
 ﻿using RT.Serialization;
+using RT.Serialization.Settings;
 using RT.Util;
 
 namespace RomanKeys;
 
 static class Program
 {
-    public static Settings Settings;
+    public static SettingsFile<Settings> SettingsFile;
 
     private static GlobalKeyboardListener _keyboard;
 
@@ -17,12 +18,12 @@ static class Program
         Classify.DefaultOptions.AddTypeSubstitution(new HotkeyTypeOptions());
         Classify.DefaultOptions.AddTypeSubstitution(new TimeSpanTypeOptions());
         Classify.DefaultOptions.AddTypeSubstitution(new ColorTypeOptions());
-        SettingsUtil.LoadSettings(out Settings);
+        SettingsFile = new SettingsFileXml<Settings>("RomanKeys");
 
-        if (Settings.Modules.Count == 0)
-            Settings.Modules.Add(new BrightnessModule());
+        if (SettingsFile.Settings.Modules.Count == 0)
+            SettingsFile.Settings.Modules.Add(new BrightnessModule());
 
-        Settings.Save();
+        SettingsFile.Save();
 
         _keyboard = new GlobalKeyboardListener();
         _keyboard.HookAllKeys = true;
@@ -34,7 +35,7 @@ static class Program
 
     private static void keyboard_KeyDown(object sender, GlobalKeyEventArgs e)
     {
-        foreach (var module in Program.Settings.Modules)
+        foreach (var module in Program.SettingsFile.Settings.Modules)
             if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), true))
             {
                 e.Handled = true;
@@ -44,7 +45,7 @@ static class Program
 
     private static void keyboard_KeyUp(object sender, GlobalKeyEventArgs e)
     {
-        foreach (var module in Program.Settings.Modules)
+        foreach (var module in Program.SettingsFile.Settings.Modules)
             if (module.HandleKey(new Hotkey((Key) e.VirtualKeyCode, e.ModifierKeys), false))
             {
                 e.Handled = true;

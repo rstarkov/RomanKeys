@@ -5,8 +5,7 @@ using RT.Util.ExtensionMethods;
 
 namespace RomanKeys;
 
-[Settings("RomanKeys", SettingsKind.UserSpecific)]
-sealed class Settings : SettingsBase
+sealed class Settings
 {
     public List<IModule> Modules = new();
 }
